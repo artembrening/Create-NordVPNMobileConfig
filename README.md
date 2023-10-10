@@ -3,7 +3,7 @@ Gatters all NordVPN IKEv2 servers via the API and creates .mobileconfig files wi
 
 How to use:
 
-1. Run the script
+1. Run the PowerShell script on your Windows PC
    
 2. Go to: https://my.nordaccount.com/de/dashboard/nordvpn/manual-configuration/ and note down your username and password
    
@@ -13,7 +13,7 @@ How to use:
    
 5. Type your password when asked
    
-6. Wait until the script finishes
+6. Wait until the script finishes and copy the necessary VPN .mobileconfig files to your Mac device
 
 7. Download "Apple Configurator" from the App Store on your Mac
 
