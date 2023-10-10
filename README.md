@@ -1,5 +1,5 @@
 # Create-NordVPNMobileConfig
-Gatters all NordVPN IKEv2 servers via the API and creates .mobileconfig files with custom data  
+Gatters all NordVPN IKEv2 servers via the API and creates .mobileconfig files with custom data  (and installs the NordVPN Root CA on your Apple TV)
 
 How to use:
 
