@@ -59,8 +59,28 @@ if ($OutputPath -ne $null){
     }
 
     # Filter the flattened data to get a list of servers that support IKEv2, and sort them by name.
-    $ServerList = $flattenedData | select name, domain, categories_0_name, ip_address, features_ikev2 | Where {$_.features_ikev2 -eq "True"} | Sort-Object -Property name
+    $ServerList = $flattenedData | select name, country, domain, categories_0_name, ip_address, features_ikev2 | Where {$_.features_ikev2 -eq "True"} | Sort-Object -Property name
 
+	# Access the 'countries' column
+	
+	$countries = $flattenedData | Select-Object -ExpandProperty country
+	
+	# Remove duplicates
+	
+	$uniqueCountries = $countries | Select-Object -Unique
+
+	foreach ($uniqueCountry in $uniqueCountries){
+
+		if ((Test-Path "$OutputPath\$uniqueCountry") -ne $true){
+
+			New-Item -ItemType Directory -Path "$OutputPath\$uniqueCountry"
+
+			Write-Host "Created directory for $uniqueCountry at "$OutputPath\$uniqueCountry" as it didn't exist yet at the output path."
+
+		}
+
+	}
+	
     # Process each server in the list.
 
     foreach ($Server in $ServerList){
@@ -234,9 +254,9 @@ if ($OutputPath -ne $null){
 "@ -f $vpnName, $payloadUUID, $mainPayloadUUID, $UsernameVPN, $PasswordVPN
 
 # Save to a .mobileconfig file
-$xmlContent | Out-File "$OutputPath\$vpnName.mobileconfig"
+$xmlContent | Out-File "$OutputPath\$($Server.country)\$vpnName.mobileconfig"
 
-Write-Host "File saved to $OutputPath\$vpnName.mobileconfig"
+Write-Host "File saved to $OutputPath\$($Server.country)\$vpnName.mobileconfig"
 
 }
 
