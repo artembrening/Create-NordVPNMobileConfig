@@ -16,7 +16,15 @@ if ($OutputPath -ne $null){
     $PasswordVPN = Read-Host "Password"
 
     # Fetch the NordVPN server list using their API and parse the JSON result.
-    $Servers = ConvertFrom-Json (Invoke-WebRequest -Uri "https://nordvpn.com/api/server" -UseBasicParsing).Content
+	$Servers = @()
+	$Page = 0
+	$PageSize = 100
+	do {
+		$Response = Invoke-WebRequest -Uri "https://api.nordvpn.com/v1/servers?limit=$PageSize&offset=$($Page * $PageSize)" -UseBasicParsing
+		$PageData = ConvertFrom-Json $Response.Content
+		$Servers += $PageData
+		$Page++
+	} while ($PageData.Count -eq $PageSize)
 
     # Assign the fetched servers to another variable for further processing.
     $data = $Servers
@@ -59,11 +67,11 @@ if ($OutputPath -ne $null){
     }
 
     # Filter the flattened data to get a list of servers that support IKEv2, and sort them by name.
-    $ServerList = $flattenedData | select name, country, domain, categories_0_name, ip_address, features_ikev2 | Where {$_.features_ikev2 -eq "True"} | Sort-Object -Property name
+	$ServerList = $flattenedData | select name, locations_0_country_name, hostname, technologies_0_name, station, technologies_0_identifier | Where {$_.technologies_0_identifier -eq "ikev2"} | Sort-Object -Property name
 
 	# Access the 'countries' column
 	
-	$countries = $flattenedData | Select-Object -ExpandProperty country
+	$countries = $flattenedData | Select-Object -ExpandProperty locations_0_country_name
 	
 	# Remove duplicates
 	
@@ -85,7 +93,7 @@ if ($OutputPath -ne $null){
 
     foreach ($Server in $ServerList){
 
-        [string]$vpnName = $Server.domain
+        [string]$vpnName = $Server.hostname
 
         # Generate new UUIDs
 
@@ -254,9 +262,9 @@ if ($OutputPath -ne $null){
 "@ -f $vpnName, $payloadUUID, $mainPayloadUUID, $UsernameVPN, $PasswordVPN
 
 # Save to a .mobileconfig file
-$xmlContent | Out-File "$OutputPath\$($Server.country)\$vpnName.mobileconfig"
+$xmlContent | Out-File "$OutputPath\$($Server.locations_0_country_name)\$vpnName.mobileconfig"
 
-Write-Host "File saved to $OutputPath\$($Server.country)\$vpnName.mobileconfig"
+Write-Host "File saved to $OutputPath\$($Server.locations_0_country_name)\$vpnName.mobileconfig"
 
 }
 
