@@ -1,4 +1,6 @@
-﻿# Load the required assembly for the Windows Forms FolderBrowserDialog.
+﻿# Author: Artem Brening // https://www.linkedin.com/in/artem-brening/
+
+# Load the required assembly for the Windows Forms FolderBrowserDialog.
 Add-Type -AssemblyName System.Windows.Forms
 
 # Create a new folder browser dialog object.
